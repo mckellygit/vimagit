@@ -43,7 +43,7 @@ let g:magit_warning_max_lines      = get(g:, 'magit_warning_max_lines',         
 
 let g:magit_git_cmd                = get(g:, 'magit_git_cmd'          ,         "git")
 
-execute "nnoremap <silent> " . g:magit_show_magit_mapping . " :call magit#show_magit('v')<cr>"
+"execute "nnoremap <silent> " . g:magit_show_magit_mapping . " :call magit#show_magit('v')<cr>"
 
 if (g:magit_refresh_gutter == 1 || g:magit_refresh_gitgutter == 1)
   autocmd User VimagitUpdateFile
@@ -89,7 +89,8 @@ function! s:mg_get_info()
 	let push_br=magit#git#get_remote_branch("HEAD", "push")
 	let max_br_w = max([len(head_br), len(upstream_br), len(push_br)])
 
-	let limit=winwidth(0)-align_w-max_br_w-3
+	let limit=winwidth('%')-align_w-max_br_w-5
+
 	let head_msg=s:mg_cut_str(magit#git#get_commit_subject("HEAD"), limit)
 	let upstream_msg=s:mg_cut_str(magit#git#get_commit_subject(upstream_br), limit)
 	let push_msg=s:mg_cut_str(magit#git#get_commit_subject(push_br), limit)
@@ -103,7 +104,6 @@ function! s:mg_get_info()
 	let push_line=magit#utils#strip(printf("%-*s %-*s %s",
 				\ align_w, g:magit_section_info.cur_push,
 				\ max_br_w, push_br, push_msg))
-
 
 	silent put =g:magit_sections.info
 	silent put =magit#utils#underline(g:magit_sections.info)
@@ -559,7 +559,8 @@ function! magit#update_buffer(...)
 	let buffer_name=bufname("%")
 	" (//|\\\\) is to handle old vim 7.4-0 fnameescape behavior on Windows
 	if ( buffer_name !~ "\\v^magit:(//|\\\\).*" )
-		echoerr "Not in magit buffer but in " . buffer_name
+		" mck - skip error msg so we can have magit remain after commits
+		"echoerr "Not in magit buffer but in " . buffer_name
 		return
 	endif
 	
@@ -706,7 +707,8 @@ function! magit#update_buffer(...)
 			let section_line=search(g:magit_sections[cur_section], "bnw")
 			call cursor(section_line, 0)
 		endif
-		silent execute "normal! zt"
+		" mck - skip scroll for now
+		"silent execute "normal! zt"
 	endif
 
 	if exists(':AirlineRefresh')
