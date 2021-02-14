@@ -240,14 +240,51 @@ function! magit#git#git_apply(header, selection)
 	if ( selection[-1] !~ '^$' )
 		let selection += [ '' ]
 	endif
-	let git_cmd=g:magit_git_cmd . " apply --recount --no-index --cached -p0 -"
+    " TODO: add extra option variable to add here to cmd, if set ...
+	let git_cmd=g:magit_git_cmd . " apply --recount --no-index --cached --whitespace=warn -p0 -"
 	try
+
+        cclose
 		silent let git_result=magit#sys#system(git_cmd, selection)
+
+        redraw!
+
+        if empty(git_result)
+            return
+        endif
+
+        "echom "git_result = " . git_result
+
+        try
+            cgete git_result
+            copen
+            exec 'normal! G'
+            wincmd p
+        catch /E776:/
+        endtry
+
+        "let tmpf = tempname()
+        "execute 'redir > ' . tmpf
+        "silent echo git_result
+        "silent echo "\n"
+        "silent! redir END
+        "execute 'AsyncRun -raw -strip -mode=term -pos=bottom -rows=10 cat ' tmpf ' ; rm -f ' tmpf
+        "wincmd p
+        "redraw!
+
 	catch 'shell_error'
-		call magit#sys#print_shell_error()
-		echom "Tried to aply this"
-		echom string(selection)
-		throw 'apply error'
+        "echom "Error msg: " . b:magit_shell_error
+		"call magit#sys#print_shell_error()
+		"echom "Tried to apply this"
+		"echom string(selection)
+		"throw 'apply error'
+        try
+            cgete b:magit_shell_error
+            copen
+            exec 'normal! G'
+            wincmd p
+        catch /E776:/
+        endtry
 	endtry
 endfunction
 
@@ -266,15 +303,27 @@ function! magit#git#git_unapply(header, selection, mode)
 	if ( selection[-1] !~ '^$' )
 		let selection += [ '' ]
 	endif
+    " TODO: add extra option variable to add here to cmd, if set ...
 	try
+        cclose
 		silent let git_result=magit#sys#system(
-			\ g:magit_git_cmd . " apply --recount --no-index -p0 --reverse " .
+			\ g:magit_git_cmd . " apply --recount --no-index --whitespace=warn -p0 --reverse " .
 			\ cached_flag . " - ", selection)
+
+        redraw!
 	catch 'shell_error'
-		call magit#sys#print_shell_error()
-		echom "Tried to unaply this"
-		echom string(selection)
-		throw 'unapply error'
+        "echom "Error msg: " . b:magit_shell_error
+		"call magit#sys#print_shell_error()
+		"echom "Tried to unapply this"
+		"echom string(selection)
+		"throw 'unapply error'
+        try
+            cgete b:magit_shell_error
+            copen
+            exec 'normal! G'
+            wincmd p
+        catch /E776:/
+        endtry
 	endtry
 endfunction
 

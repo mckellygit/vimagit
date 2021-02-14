@@ -687,7 +687,8 @@ function! magit#update_buffer(...)
 
 					if ( file.is_visible() )
 						call cursor(file.get_hunks()[hunk_id].line_pos, 0)
-						if ( g:magit_auto_foldopen )
+                        " mck - dont auto open fold ...
+						if ( g:magit_auto_foldopen == 2)
 							foldopen
 						endif
 					else
@@ -938,7 +939,8 @@ function! s:mg_stage_closed_file(discard)
 		let section=magit#helper#get_section()
 		
 		let file = b:state.get_file(section, filename)
-		if ( file.is_visible() == 0 ||
+        " mck - seems it shuold be if is_vis == 1 ...
+		if ( file.is_visible() == 1 ||
 			\ file.is_dir() == 1 )
 			if ( a:discard == 0 )
 				if ( section == 'unstaged' )
@@ -1083,6 +1085,13 @@ function! magit#stage_file()
 			echomsg "https://github.com/jreybert/vimagit/issues/new"
 			return
 		endtry
+        " mck - search above for file ...
+        silent exec "silent normal! ?modified:\<CR>"
+	    try
+		    call <SID>mg_stage_closed_file(0)
+		    return
+	    catch 'out_of_block'
+        endtry
 		let selection = getline(start, end)
 	endtry
 	return magit#stage_block(selection, 0)
@@ -1351,6 +1360,18 @@ function! magit#get_current_mode()
 	elseif ( b:magit_current_commit_mode == 'CA' )
 		return "AMEND"
 	endif
+endfunction
+
+" magit#stage_all
+function! magit#stage_all()
+    let section=magit#helper#get_section()
+    if ( section == 'unstaged' )
+        call magit#sys#system(g:magit_git_cmd . " add -u")
+    elseif ( section == 'staged' )
+        call magit#sys#system(g:magit_git_cmd . " reset --mixed")
+    endif
+    call magit#update_buffer()
+    call magit#utils#clear_undo()
 endfunction
 
 command! Magit call magit#show_magit('v')

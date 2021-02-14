@@ -1,5 +1,5 @@
 
-let g:magit_stage_file_mapping     = get(g:, 'magit_stage_file_mapping',        'F' )
+let g:magit_stage_file_mapping     = get(g:, 'magit_stage_file_mapping',        'FF' )
 let g:magit_stage_hunk_mapping     = get(g:, 'magit_stage_hunk_mapping',        'S' )
 let g:magit_stage_line_mapping     = get(g:, 'magit_stage_line_mapping',        'L' )
 let g:magit_mark_line_mapping      = get(g:, 'magit_mark_line_mapping',         'M' )
@@ -9,6 +9,7 @@ let g:magit_commit_fixup_mapping   = get(g:, 'magit_commit_fixup_mapping',      
 let g:magit_close_commit_mapping   = get(g:, 'magit_close_commit_mapping',      'CU' )
 let g:magit_reload_mapping         = get(g:, 'magit_reload_mapping',            'R' )
 let g:magit_edit_mapping           = get(g:, 'magit_edit_mapping',              'E' )
+let g:magit_stage_all_mapping      = get(g:, 'magit_stage_all_mapping',         'FA' )
 
 let g:magit_jump_next_hunk         = get(g:, 'magit_jump_next_hunk',            '<C-N>')
 let g:magit_jump_prev_hunk         = get(g:, 'magit_jump_prev_hunk',            '<C-P>')
@@ -111,15 +112,17 @@ endfunction
 function! magit#mapping#set_default()
 
 	call s:mg_set_mapping('n', g:magit_stage_hunk_mapping,
-				\"magit#stage_hunk(0)", '\<\%(un\)\?staged\>')
+                \ "magit#stage_hunk(0)", '\<\%(un\)\?staged\>')
 	call s:mg_set_mapping('n', g:magit_stage_file_mapping,
 				\ "magit#stage_file()", '\<\%(un\)\?staged\>')
 	call s:mg_set_mapping('n', g:magit_discard_hunk_mapping,
 				\ "magit#stage_hunk(1)", '\<\%(un\)\?staged\>')
 	call s:mg_set_mapping('n', g:magit_stage_line_mapping,
 				\ "magit#stage_vselect()", '\<\%(un\)\?staged\>')
+
 	call s:mg_set_mapping('x', g:magit_stage_hunk_mapping,
 				\ "magit#stage_vselect()", '\<\%(un\)\?staged\>')
+
 	call s:mg_set_mapping('n', g:magit_mark_line_mapping,
 				\ "magit#mark_vselect()", '\<\%(un\)\?staged\>')
 	call s:mg_set_mapping('x', g:magit_mark_line_mapping,
@@ -157,6 +160,9 @@ function! magit#mapping#set_default()
 	call s:mg_set_mapping('n', g:magit_jump_prev_hunk,
 				\ "magit#jump_hunk('P')")
 
+    call s:mg_set_mapping('n', g:magit_stage_all_mapping,
+                \ "magit#stage_all()")
+
 	for mapping in g:magit_folding_toggle_mapping
 		" trick to pass '<cr>' in a mapping command without being interpreted
 		let func_arg = ( mapping ==? "<cr>" ) ? '+' : mapping
@@ -183,7 +189,9 @@ function! magit#mapping#set_default()
 \.'      if cursor in hunk, mark line under cursor "to be unstaged"',
 \'       if visual selection in hunk (with v), mark selected lines "to be unstaged"',
 \g:magit_stage_file_mapping
-\.'      if cursor on filename header or hunk, unstage whole file',
+\.'     if cursor on filename header or hunk, unstage whole file',
+\g:magit_stage_all_mapping
+\.'     unstage all files',
 \g:magit_edit_mapping
 \.'      edit, jump cursor to file containing this hunk',
 \g:magit_jump_next_hunk.','.g:magit_jump_prev_hunk
@@ -197,11 +205,13 @@ function! magit#mapping#set_default()
 \'       if lines marked in hunk (with ' . g:magit_mark_line_mapping . '), stage marked lines',
 \g:magit_stage_line_mapping
 \.'      stage the line under the cursor',
+\g:magit_stage_all_mapping
+\.'     stage all files, except untracked (git add -u)',
 \g:magit_mark_line_mapping
 \.'      if cursor in hunk, mark line under cursor "to be staged"',
 \'       if visual selection in hunk (with v), mark selected lines "to be staged"',
 \g:magit_stage_file_mapping
-\.'      if cursor on filename header or hunk, stage whole file',
+\.'     if cursor on filename header or hunk, stage whole file',
 \g:magit_edit_mapping
 \.'      edit, jump cursor to file containing this hunk',
 \g:magit_jump_next_hunk.','.g:magit_jump_prev_hunk
@@ -232,7 +242,7 @@ function! magit#mapping#set_default()
 \g:magit_diff_shrink.','.g:magit_diff_enlarge.','.g:magit_diff_reset
 \.    '  shrink,enlarge,reset diff context',
 \g:magit_close_mapping
-\.'      close magit buffer',
+\.'    close magit buffer',
 \g:magit_toggle_help_mapping
 \.'      toggle help showing in magit buffer',
 \'======='
