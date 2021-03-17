@@ -43,6 +43,8 @@ let g:magit_warning_max_lines      = get(g:, 'magit_warning_max_lines',         
 
 let g:magit_git_cmd                = get(g:, 'magit_git_cmd'          ,         "git")
 
+let g:magit_commit_args            = ''
+
 "execute "nnoremap <silent> " . g:magit_show_magit_mapping . " :call magit#show_magit('v')<cr>"
 
 if (g:magit_refresh_gutter == 1 || g:magit_refresh_gitgutter == 1)
@@ -232,10 +234,10 @@ function! s:mg_get_commit_section()
 		" refresh the COMMIT_EDITMSG file
 		if ( b:magit_current_commit_mode == 'CC' )
 			silent! call magit#sys#system_noraise("GIT_EDITOR=/bin/false " .
-						\ g:magit_git_cmd . " -c commit.verbose=no commit -e 2> /dev/null")
+						\ g:magit_git_cmd . " " . g:magit_commit_args . " -c commit.verbose=no commit -e 2> /dev/null")
 		elseif ( b:magit_current_commit_mode == 'CA' )
 			silent! call magit#sys#system_noraise("GIT_EDITOR=/bin/false " .
-						\ g:magit_git_cmd . " -c commit.verbose=no commit --amend -e 2> /dev/null")
+						\ g:magit_git_cmd . " " . g:magit_commit_args . " -c commit.verbose=no commit --amend -e 2> /dev/null")
 		endif
 		if ( !empty(b:magit_current_commit_msg) )
 			silent put =b:magit_current_commit_msg
@@ -376,6 +378,7 @@ function! s:mg_git_commit(mode) abort
 		if ( a:mode == 'CA' )
 			let commit_flag.=" --amend "
 		endif
+		let commit_flag.= " " . g:magit_commit_args . " "
 		let commit_cmd=g:magit_git_cmd . " commit " . commit_flag .
 					\ " --file - "
 		try
