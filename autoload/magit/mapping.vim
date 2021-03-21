@@ -219,7 +219,7 @@ function! magit#mapping#set_default()
 \g:magit_discard_hunk_mapping
 \.  '    discard file changes (warning, changes will be lost)',
 \g:magit_ignore_mapping
-\.'      add file in .gitgnore',
+\.'    add file in .gitgnore',
 \],
 			\ 'global': [
 \g:magit_sections['help'],
@@ -236,7 +236,7 @@ function! magit#mapping#set_default()
 \. '     From stage mode: amend staged changes to previous commit without',
 \'       modifying the previous commit message',
 \g:magit_close_commit_mapping
-\. '     commit undo, cancel and close current commit message',
+\.'    commit undo, cancel and close current commit message',
 \g:magit_reload_mapping
 \.'      refresh magit buffer',
 \g:magit_diff_shrink.','.g:magit_diff_enlarge.','.g:magit_diff_reset
