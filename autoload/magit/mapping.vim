@@ -109,6 +109,18 @@ function! s:mg_set_mapping(mode, mapping, function, ...)
 	endif
 endfunction
 
+function! s:MagitUnCommit()
+    if ( b:magit_current_commit_mode == '' )
+        return
+    endif
+    call magit#close_commit()
+    try
+        silent exec "silent normal! /Staged\<CR>"
+        silent exec "silent normal! 0"
+    catch /E486:/
+    endtry
+endfunction
+
 function! magit#mapping#set_default()
 
 	call s:mg_set_mapping('n', g:magit_stage_hunk_mapping,
@@ -175,6 +187,11 @@ function! magit#mapping#set_default()
 		execute "nnoremap <buffer><silent><nowait> " . mapping . " :call <SID>mg_open_close_folding_wrapper('" . mapping . "', 0)<return>"
 	endfor
 
+    autocmd FileType magit nnoremap <silent> <buffer> CS :let g:magit_commit_args='--signoff'<CR>:call magit#commit_command('CC')<CR>
+    autocmd FileType magit nnoremap <silent> <buffer> CB :let g:magit_commit_args='--signoff'<CR>:call magit#commit_command('CA')<CR>
+    autocmd FileType magit nnoremap <silent> <buffer> CX :call <SID>MagitUnCommit()<CR>
+    autocmd FileType magit nnoremap <silent> <buffer> CU <Nop>
+
 	" s:magit_inline_help: Dict containing inline help for each section
 	let s:magit_inline_help = {
 			\ 'staged': [
@@ -229,12 +246,18 @@ function! magit#mapping#set_default()
 \. '     From stage mode: set commit mode in normal flavor',
 \'       From commit mode: commit all staged changes with commit flavor',
 \'       (normal or amend) with message in "Commit message" section',
+\'CS'
+\.'     signed commit (CC with --signoff)',
 \g:magit_commit_amend_mapping
 \. '     From stage or commit mode: set commit mode in amend flavor, and',
 \'       display "Commit message" section with previous commit message.',
+\'CB'
+\.'     signed commit amend (CA with --signoff)',
 \g:magit_commit_fixup_mapping
 \. '     From stage mode: amend staged changes to previous commit without',
 \'       modifying the previous commit message',
+\'CX'
+\.'     commit undo',
 \g:magit_close_commit_mapping
 \.'    commit undo, cancel and close current commit message',
 \g:magit_reload_mapping
