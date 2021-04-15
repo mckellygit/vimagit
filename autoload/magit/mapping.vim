@@ -189,8 +189,7 @@ function! magit#mapping#set_default()
 
     autocmd FileType magit nnoremap <silent> <buffer> CS :let g:magit_commit_args='--signoff'<CR>:call magit#commit_command('CC')<CR>
     autocmd FileType magit nnoremap <silent> <buffer> CB :let g:magit_commit_args='--signoff'<CR>:call magit#commit_command('CA')<CR>
-    autocmd FileType magit nnoremap <silent> <buffer> CX :call <SID>MagitUnCommit()<CR>
-    autocmd FileType magit nnoremap <silent> <buffer> CU <Nop>
+    autocmd FileType magit nnoremap <silent> <buffer> CU :call <SID>MagitUnCommit()<CR>
 
 	" s:magit_inline_help: Dict containing inline help for each section
 	let s:magit_inline_help = {
@@ -256,7 +255,7 @@ function! magit#mapping#set_default()
 \g:magit_commit_fixup_mapping
 \. '     From stage mode: amend staged changes to previous commit without',
 \'       modifying the previous commit message',
-\'CX'
+\'CU'
 \.'     commit undo',
 \g:magit_close_commit_mapping
 \.'    commit undo, cancel and close current commit message',
