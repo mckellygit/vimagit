@@ -942,8 +942,14 @@ function! s:mg_stage_closed_file(discard)
 		let section=magit#helper#get_section()
 		
 		let file = b:state.get_file(section, filename)
-        " mck - seems it shuold be if is_vis == 1 ...
-		if ( file.is_visible() == 1 ||
+
+        "echom "filename = " . filename
+        "echom "file.is_visible() = " . file.is_visible()
+        "echom "discard = " . a:discard
+        "echom "section = " . section
+
+        " mck - seems it should be if is_vis == 1 ?
+		if ( file.is_visible() >= 0 ||
 			\ file.is_dir() == 1 )
 			if ( a:discard == 0 )
 				if ( section == 'unstaged' )
@@ -1089,7 +1095,10 @@ function! magit#stage_file()
 			return
 		endtry
         " mck - search above for file ...
-        silent exec "silent normal! ?modified:\<CR>"
+        try
+            silent exec "silent normal! ?modified:\<CR>"
+        catch /E486:/
+        endtry
 	    try
 		    call <SID>mg_stage_closed_file(0)
 		    return
